@@ -6,7 +6,7 @@ import utils
 
 
 class DQNAgent(nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super(DQNAgent, self).__init__()
         
         self.fc = nn.Sequencial(
@@ -19,21 +19,26 @@ class DQNAgent(nn.Module):
         )
         
         
-    def forward(self, state: np.ndarray, device: torch.device):
+    def forward(self, state: np.ndarray, device: torch.device, epsilon: float = 0.05) -> torch.Tensor:
         '''
         Pass a map through the DQN
         '''
-        # Prep map for fc layer
-        x = state.flatten()
-        x = torch.from_numpy(x)
-        x.to(device)
+        # Explore
+        if np.random.random() <= epsilon:
+            return np.random.randint(0, 4)
         
-        out = self.fc(x)
-        return torch.round(out)
+        # Exploit
+        else:
+            # Prep map for fc layer
+            x = state.flatten()
+            x = torch.from_numpy(x)
+            x.to(device)
+            
+            return self.fc(x)
     
     
-    def __call__(self, map: np.ndarray) -> Tuple[int, int]:
+    def __call__(self, state: np.ndarray) -> int:
         super(DQNAgent, self).__call__()
-        return self.forward(self, device=utils.get_device(), map=map)
         
-print()
+        q_vals = self.forward(self, device=utils.get_device(), state=state)
+        return torch.argmax(q_vals).item()

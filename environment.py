@@ -28,10 +28,11 @@ class Env:
         return prey_r, pred_r
         
         
-    def step(self, prey_action: tuple, pred_action: tuple) -> Tuple[np.ndarray, float, float, bool]:
+    def step(self, prey_action: int, pred_action: int) -> Tuple[np.ndarray, float, float, bool]:
         '''
         Updates the environment by one step
         '''
+        get_action = lambda action_index: (1, 0) if action_index == 0 else (action_index: (0, -1) if action_index == 1 else (action_index: (-1, 0) if action_index == 2 else (0, 1)))
         self.states.append(self.states[-1])
         
         # Reset current agent locations
@@ -67,5 +68,3 @@ class Env:
         state[pred_loc[0]][pred_loc[1]] = 2.0 # Starting location of the predator
         
         return state, prey_loc, pred_loc
-    
-print()

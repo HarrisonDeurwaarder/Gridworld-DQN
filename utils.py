@@ -19,18 +19,18 @@ class ReplayBuffer:
         return len(self.buffer)
     
     
-    def add(self, state: torch.tensor, action: int, reward: int, next_state: torch.tensor) -> None:
-        self.buffer.append((state, action, reward, next_state))
+    def add(self, state: torch.tensor, next_state: torch.tensor, prey_action: int, pred_action: int, prey_reward: float, pred_reward: float) -> None:
+        self.buffer.append((state, next_state, prey_action, pred_action, prey_reward, pred_reward))
         
         
     def sample(self, batch_size: int) -> torch.tensor:
         batch = np.random.sample(self.buffer, batch_size)
-        states, actions, rewards, next_states = zip(*batch)
+        states, next_states, prey_actions, pred_actions, prey_rewards, pred_rewards = zip(*batch)
         return (
             torch.tensor(states),
-            torch.tensor(actions),
-            torch.tensor(rewards),
-            torch.tensor(next_states)
+            torch.tensor(next_states),
+            torch.tensor(prey_actions),
+            torch.tensor(pred_actions),
+            torch.tensor(prey_rewards),
+            torch.tensor(pred_rewards),
         )
-        
-print()
