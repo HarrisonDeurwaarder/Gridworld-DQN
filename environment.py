@@ -32,7 +32,7 @@ class Env:
         '''
         Updates the environment by one step
         '''
-        get_action = lambda action_index: (1, 0) if action_index == 0 else (action_index: (0, -1) if action_index == 1 else (action_index: (-1, 0) if action_index == 2 else (0, 1)))
+        get_action = lambda action_index: (1, 0) if action_index == 0 else ((0, -1) if action_index == 1 else ((-1, 0) if action_index == 2 else (0, 1)))
         self.states.append(self.states[-1])
         
         # Reset current agent locations

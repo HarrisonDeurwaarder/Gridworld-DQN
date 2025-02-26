@@ -46,14 +46,37 @@ def main() -> None:
         if len(buffer) < BATCH_SIZE:
             continue
         
-        states, actions, rewards
+        states, next_states, prey_actions, pred_actions, prey_rewards, pred_rewards = buffer.sample(BATCH_SIZE)
         
         # Backpropagate through the prey DQN
-        prey_q_vals = target_prey(state)
-        target = prey_reward + DISCOUNT_FACTOR * 1
+        prey_q_vals = policy_prey.forward(states)
+        prey_q_vals_next = policy_prey.forward(next_states)
         
-        prey_loss = criterion(max(prey_q_vals), target)
-
+        # Compute the target Q-value using 
+        target = prey_rewards + DISCOUNT_FACTOR * prey_q_vals_next
+        
+        # Backwards
+        prey_one_hot = nn.functional.one_hot(prey_actions, dim=0)
+        prey_loss = criterion(max(prey_q_vals)*prey_one_hot, target*prey_one_hot)
+        prey_optimizer.zero_grad()
+        prey_loss.backward()
+        prey_optimizer.step()
+        
+        
+        # Backpropagate through the predator DQN
+        pred_q_vals = policy_pred.forward(states)
+        pred_q_vals_next = policy_pred.forward(next_states)
+        
+        # Compute the target Q-value using 
+        target = pred_rewards + DISCOUNT_FACTOR * pred_q_vals_next
+        
+        # Backwards
+        pred_one_hot = nn.functional.one_hot(pred_actions, dim=0)
+        pred_loss = criterion(max(pred_q_vals)*pred_one_hot, target*pred_one_hot)
+        pred_optimizer.zero_grad()
+        pred_loss.backward()
+        pred_optimizer.step()
+        
         
         step_count += 1
         epsilon -= EPSILON_DECAY_RATE if epsilon > EPSILON_MIN else 0
