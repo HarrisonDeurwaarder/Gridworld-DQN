@@ -4,7 +4,8 @@ from typing import Tuple
 class Env:
     def __init__(self, initial_state: np.ndarray, prey_loc: Tuple[int, int], pred_loc: Tuple[int, int], terminal_reward: float = 10, distance_scale_factor: float = 0.5):
         self.states = [initial_state]
-        self.prey_locs
+        self.prey_locs = [prey_loc]
+        self.pred_locs = [pred_loc]
         
         self.tr = terminal_reward
         self.dsf = distance_scale_factor
@@ -40,12 +41,12 @@ class Env:
         self.states[-1][self.pred_locs[0]][self.pred_locs[1]] = 0.0
         
         # Assign new agent locations
-        self.prey_value = (loc := (self.state[0] + prey_action[0]) if loc <= 0 or loc >= 9 else self.grid[0], loc := (self.grid[1] + prey_action[1]) if loc <= 0 or loc >= 9 else self.grid[0])
-        self.pred_value = (loc := (self.state[0] + pred_action[0]) if loc <= 0 or loc >= 9 else self.grid[0], loc := (self.grid[1] + pred_action[1]) if loc <= 0 or loc >= 9 else self.grid[0])
+        self.prey_locs.append((loc := (self.state[0] + prey_action[0]) if loc <= 0 or loc >= 9 else self.grid[0], loc := (self.grid[1] + prey_action[1]) if loc <= 0 or loc >= 9 else self.grid[0]))
+        self.pred_locs.append((loc := (self.state[0] + pred_action[0]) if loc <= 0 or loc >= 9 else self.grid[0], loc := (self.grid[1] + pred_action[1]) if loc <= 0 or loc >= 9 else self.grid[0]))
         
         # Handle agent relocating
-        self.states[-1][loc := (self.state[0] + prey_action[0]) if loc <= 0 or loc >= 9 else self.grid[0]][loc := (self.grid[1] + prey_action[1]) if loc <= 0 or loc >= 9 else self.grid[0]] = 1
-        self.states[-1][loc := (self.state[0] + pred_action[0]) if loc <= 0 or loc >= 9 else self.grid[0]][loc := (self.grid[1] + pred_action[1]) if loc <= 0 or loc >= 9 else self.grid[0]] = 1
+        self.states[-1][self.prey_locs[0]][self.prey_locs[1]] = 1.0
+        self.states[-1][self.pred_locs[0]][self.pred_locs[1]] = 2.0
         
         prey_r, pred_r = self.reward()
     
@@ -54,7 +55,7 @@ class Env:
         
         
     @classmethod
-    def gen_grid() -> Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]:
+    def gen_grid(cls) -> Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]:
         '''
         Creates a new 10x10 map, randomly places the prey and pred
         '''

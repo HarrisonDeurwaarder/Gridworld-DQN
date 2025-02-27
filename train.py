@@ -21,7 +21,7 @@ def main() -> None:
     policy_pred, target_pred = model.DQNAgent(), model.DQNAgent()
     
     buffer = utils.ReplayBuffer(BUFFER_SIZE)
-    prey_optimizer, pred_optimizer = optim.Adam(), optim.Adam()
+    prey_optimizer, pred_optimizer = optim.Adam(policy_prey.parameters()), optim.Adam(policy_pred.parameters())
     criterion = nn.MSELoss()
     
     episode = environment.Env(*environment.Env.gen_grid(), 

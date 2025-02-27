@@ -9,7 +9,7 @@ class DQNAgent(nn.Module):
     def __init__(self) -> None:
         super(DQNAgent, self).__init__()
         
-        self.fc = nn.Sequencial(
+        self.fc = nn.Sequential(
             nn.Linear(100, 40),
             nn.ReLU(),
             nn.Linear(40, 10),
