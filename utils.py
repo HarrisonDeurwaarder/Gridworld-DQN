@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import random as r
 from collections import deque
 
 
@@ -9,6 +10,16 @@ def get_device():
     '''
     return torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+
+def verify_shift(state: np.ndarray, point: tuple, shift: tuple, value: tuple) -> np.ndarray:
+    '''
+    Attempts to perform a shift of a point through a state, unless it encounters an edge
+    '''
+    x_candidate, y_candidate = point[0] + shift[0], point[1] + shift[1]
+    return (x_candidate if x_candidate < state.shape[0] and x_candidate > 0 else point[0], 
+            y_candidate if y_candidate < state.shape[1] and y_candidate > 0 else point[1])
+    
+    
 
 class ReplayBuffer:
     def __init__(self, capacity: int) -> None:
@@ -24,13 +35,13 @@ class ReplayBuffer:
         
         
     def sample(self, batch_size: int) -> torch.tensor:
-        batch = np.random.sample(self.buffer, batch_size)
+        batch = r.sample(self.buffer, batch_size)
         states, next_states, prey_actions, pred_actions, prey_rewards, pred_rewards = zip(*batch)
         return (
-            torch.tensor(states),
-            torch.tensor(next_states),
-            torch.tensor(prey_actions),
-            torch.tensor(pred_actions),
-            torch.tensor(prey_rewards),
-            torch.tensor(pred_rewards),
+            np.array(states),
+            np.array(next_states),
+            np.array(prey_actions),
+            np.array(pred_actions),
+            np.array(prey_rewards),
+            np.array(pred_rewards),
         )

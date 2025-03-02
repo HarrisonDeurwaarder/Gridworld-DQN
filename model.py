@@ -19,26 +19,20 @@ class DQNAgent(nn.Module):
         )
         
         
-    def forward(self, state: np.ndarray, device: torch.device, epsilon: float = 0.05) -> torch.Tensor:
+    def forward(self, state: np.ndarray, device: torch.device = torch.device('cpu')) -> torch.Tensor:
         '''
-        Pass a map through the DQN
+        Pass a state through the DQN
         '''
-        # Explore
-        if np.random.random() <= epsilon:
-            return np.random.randint(0, 4)
+        # Prep map for fc layer
+        x = torch.from_numpy(state)
+        x = x.float()
+        x = x.flatten()
+        x.to(device)
         
-        # Exploit
-        else:
-            # Prep map for fc layer
-            x = state.flatten()
-            x = torch.from_numpy(x)
-            x.to(device)
-            
-            return self.fc(x)
+        return self.fc(x)
     
     
     def __call__(self, state: np.ndarray) -> int:
-        super(DQNAgent, self).__call__()
+        q_vals = super(DQNAgent, self).__call__(state, utils.get_device())
         
-        q_vals = self.forward(self, device=utils.get_device(), state=state)
         return torch.argmax(q_vals).item()
