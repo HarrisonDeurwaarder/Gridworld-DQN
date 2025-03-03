@@ -53,11 +53,11 @@ def main() -> None:
         states, next_states, prey_actions, pred_actions, prey_rewards, pred_rewards = buffer.sample(BATCH_SIZE)
         
         # Backpropagate through the prey DQN
-        print(type(states))
-        prey_q_vals = policy_prey.forward(states, utils.get_device())
-        prey_q_vals_next = policy_prey.forward(next_states, utils.get_device())
+        prey_q_vals = policy_prey(states)
+        prey_q_vals_next = policy_prey(next_states)
         
         # Compute the target Q-value using 
+        print(prey_rewards.shape, prey_q_vals.shape)
         target = prey_rewards + DISCOUNT_FACTOR * prey_q_vals_next
         
         # Backwards
