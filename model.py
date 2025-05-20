@@ -28,10 +28,10 @@ class DQNAgent(nn.Module):
         x = x.float()
         x = x.flatten(start_dim=-2)
         x.to(device)
-        return self.fc(x).cpu().numpy()
+        return self.fc(x)
     
     
     def __call__(self, state: np.ndarray) -> int:
         q_vals = super(DQNAgent, self).__call__(state, utils.get_device())
         
-        return torch.argmax(q_vals, dim=-1)
+        return torch.argmax(q_vals, dim=-1).numpy()
