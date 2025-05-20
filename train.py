@@ -2,6 +2,7 @@ import model, environment, utils
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import numpy as np
     
     
 def main() -> None:
@@ -61,7 +62,7 @@ def main() -> None:
         target = prey_rewards + DISCOUNT_FACTOR * prey_q_vals_next
         
         # Backwards
-        prey_one_hot = nn.functional.one_hot(prey_actions, dim=0)
+        prey_one_hot = np.eye(len(prey_actions))[prey_actions]
         prey_loss = criterion(max(prey_q_vals)*prey_one_hot, target*prey_one_hot)
         prey_optimizer.zero_grad()
         prey_loss.backward()
